@@ -33,18 +33,18 @@ const BackupContainer = () => {
     }
 
     return (
-        <ServerContentBlock title={'Backups'}>
+        <ServerContentBlock title={'Резервные копии'}>
             <FlashMessageRender byKey={'backups'} css={tw`mb-4`} />
             <Pagination data={backups} onPageSelect={setPage}>
                 {({ items }) =>
                     !items.length ? (
-                        // Don't show any error messages if the server has no backups and the user cannot
-                        // create additional ones for the server.
+                        // Не показывать сообщения об ошибках, если на сервере нет резервных копий и пользователь не может
+                        // создать дополнительные для сервера.
                         !backupLimit ? null : (
                             <p css={tw`text-center text-sm text-neutral-300`}>
                                 {page > 1
-                                    ? "Looks like we've run out of backups to show you, try going back a page."
-                                    : 'It looks like there are no backups currently stored for this server.'}
+                                    ? 'Похоже, что у нас закончились резервные копии для показа, попробуйте вернуться на предыдущую страницу.'
+                                    : 'Похоже, что на этом сервере нет сохраненных резервных копий.'}
                             </p>
                         )
                     ) : (
@@ -56,14 +56,14 @@ const BackupContainer = () => {
             </Pagination>
             {backupLimit === 0 && (
                 <p css={tw`text-center text-sm text-neutral-300`}>
-                    Backups cannot be created for this server because the backup limit is set to 0.
+                    Резервные копии не могут быть созданы для этого сервера, так как лимит резервных копий установлен на 0.
                 </p>
             )}
             <Can action={'backup.create'}>
                 <div css={tw`mt-6 sm:flex items-center justify-end`}>
                     {backupLimit > 0 && backups.backupCount > 0 && (
                         <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
-                            {backups.backupCount} of {backupLimit} backups have been created for this server.
+                            {backups.backupCount} из {backupLimit} резервных копий были созданы для этого сервера.
                         </p>
                     )}
                     {backupLimit > 0 && backupLimit > backups.backupCount && (

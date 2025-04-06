@@ -17,35 +17,35 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ResourceBelongsToServer
 {
     /**
-     * Looks at the request parameters to determine if the given resource belongs
-     * to the requested server. If not, a 404 error will be returned to the caller.
+     * Проверяет параметры запроса, чтобы определить, принадлежит ли данный ресурс
+     * запрашиваемому серверу. Если нет, вызывается ошибка 404.
      *
-     * This is critical to ensuring that all subsequent logic is using exactly the
-     * server that is expected, and that we're not accessing a resource completely
-     * unrelated to the server provided in the request.
+     * Это критически важно для обеспечения того, чтобы вся последующая логика
+     * использовала именно тот сервер, который ожидается, и чтобы мы не обращались
+     * к ресурсу, который совершенно не связан с сервером, указанным в запросе.
      */
     public function handle(Request $request, \Closure $next): mixed
     {
         $params = $request->route()->parameters();
         if (is_null($params) || !$params['server'] instanceof Server) {
-            throw new \InvalidArgumentException('This middleware cannot be used in a context that is missing a server in the parameters.');
+            throw new \InvalidArgumentException('Этот middleware не может быть использован в контексте, в котором отсутствует сервер в параметрах.');
         }
 
         /** @var \Pterodactyl\Models\Server $server */
         $server = $request->route()->parameter('server');
-        $exception = new NotFoundHttpException('The requested resource was not found for this server.');
+        $exception = new NotFoundHttpException('Запрашиваемый ресурс не найден для этого сервера.');
         foreach ($params as $key => $model) {
-            // Specifically skip the server, we're just trying to see if all of the
-            // other resources are assigned to this server. Also skip anything that
-            // is not currently a Model instance since those will just end up being
-            // a 404 down the road.
+            // Специально пропускаем сервер, мы просто пытаемся убедиться, что все
+            // остальные ресурсы назначены этому серверу. Также пропускаем все, что
+            // в данный момент не является экземпляром Model, так как это в любом случае
+            // приведет к 404.
             if ($key === 'server' || !$model instanceof Model) {
                 continue;
             }
 
             switch (get_class($model)) {
-                // All of these models use "server_id" as the field key for the server
-                // they are assigned to, so the logic is identical for them all.
+                // Все эти модели используют "server_id" в качестве ключевого поля для сервера,
+                // к которому они назначены, поэтому логика для них одинакова.
                 case Allocation::class:
                 case Backup::class:
                 case Database::class:
@@ -55,19 +55,20 @@ class ResourceBelongsToServer
                         throw $exception;
                     }
                     break;
-                    // Regular users are a special case here as we need to make sure they're
-                    // currently assigned as a subuser on the server.
+                    // Обычные пользователи являются особым случаем, так как нам нужно убедиться,
+                    // что они в данный момент назначены как подпользователи на сервере.
                 case User::class:
                     $subuser = $server->subusers()->where('user_id', $model->id)->first();
                     if (is_null($subuser)) {
                         throw $exception;
                     }
-                    // This is a special case to avoid an additional query being triggered
-                    // in the underlying logic.
+                    // Это особый случай, чтобы избежать дополнительного запроса в
+                    // основной логике.
                     $request->attributes->set('subuser', $subuser);
                     break;
-                    // Tasks are special since they're (currently) the only item in the API
-                    // that requires something in addition to the server in order to be accessed.
+                    // Задачи являются особым случаем, так как они (в настоящее время) являются
+                    // единственным элементом в API, который требует чего-то дополнительно к серверу
+                    // для доступа.
                 case Task::class:
                     $schedule = $request->route()->parameter('schedule');
                     if ($model->schedule_id !== $schedule->id || $schedule->server_id !== $server->id) {
@@ -75,9 +76,9 @@ class ResourceBelongsToServer
                     }
                     break;
                 default:
-                    // Don't return a 404 here since we want to make sure no one relies
-                    // on this middleware in a context in which it will not work. Fail safe.
-                    throw new \InvalidArgumentException('There is no handler configured for a resource of this type: ' . get_class($model));
+                    // Не возвращаем 404 здесь, так как мы хотим убедиться, что никто не полагается
+                    // на этот middleware в контексте, в котором он не будет работать. Безопасный отказ.
+                    throw new \InvalidArgumentException('Нет обработчика, настроенного для ресурса этого типа: ' . get_class($model));
             }
         }
 

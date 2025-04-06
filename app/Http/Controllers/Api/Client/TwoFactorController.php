@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class TwoFactorController extends ClientApiController
 {
     /**
-     * TwoFactorController constructor.
+     * Конструктор TwoFactorController.
      */
     public function __construct(
         private ToggleTwoFactorService $toggleTwoFactorService,
@@ -26,9 +26,9 @@ class TwoFactorController extends ClientApiController
     }
 
     /**
-     * Returns two-factor token credentials that allow a user to configure
-     * it on their account. If two-factor is already enabled this endpoint
-     * will return a 400 error.
+     * Возвращает учетные данные токена двухфакторной аутентификации, которые позволяют пользователю настроить
+     * его на своей учетной записи. Если двухфакторная аутентификация уже включена, этот конечный пункт
+     * вернет ошибку 400.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -36,7 +36,7 @@ class TwoFactorController extends ClientApiController
     public function index(Request $request): JsonResponse
     {
         if ($request->user()->use_totp) {
-            throw new BadRequestHttpException('Two-factor authentication is already enabled on this account.');
+            throw new BadRequestHttpException('Двухфакторная аутентификация уже включена для этой учетной записи.');
         }
 
         return new JsonResponse([
@@ -45,7 +45,7 @@ class TwoFactorController extends ClientApiController
     }
 
     /**
-     * Updates a user's account to have two-factor enabled.
+     * Обновляет учетную запись пользователя, чтобы включить двухфакторную аутентификацию.
      *
      * @throws \Throwable
      * @throws \Illuminate\Validation\ValidationException
@@ -59,7 +59,7 @@ class TwoFactorController extends ClientApiController
 
         $data = $validator->validate();
         if (!password_verify($data['password'], $request->user()->password)) {
-            throw new BadRequestHttpException('The password provided was not valid.');
+            throw new BadRequestHttpException('Предоставленный пароль недействителен.');
         }
 
         $tokens = $this->toggleTwoFactorService->handle($request->user(), $data['code'], true);
@@ -75,15 +75,15 @@ class TwoFactorController extends ClientApiController
     }
 
     /**
-     * Disables two-factor authentication on an account if the password provided
-     * is valid.
+     * Отключает двухфакторную аутентификацию на учетной записи, если предоставленный пароль
+     * действителен.
      *
      * @throws \Throwable
      */
     public function delete(Request $request): JsonResponse
     {
         if (!password_verify($request->input('password') ?? '', $request->user()->password)) {
-            throw new BadRequestHttpException('The password provided was not valid.');
+            throw new BadRequestHttpException('Предоставленный пароль недействителен.');
         }
 
         /** @var \Pterodactyl\Models\User $user */

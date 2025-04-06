@@ -17,7 +17,7 @@ use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\ReinstallServerRequest
 class SettingsController extends ClientApiController
 {
     /**
-     * SettingsController constructor.
+     * Конструктор SettingsController.
      */
     public function __construct(
         private ServerRepository $repository,
@@ -27,7 +27,7 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Renames a server.
+     * Переименовывает сервер.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -57,7 +57,7 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Reinstalls the server on the daemon.
+     * Переустанавливает сервер на демоне.
      *
      * @throws \Throwable
      */
@@ -71,14 +71,14 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Changes the Docker image in use by the server.
+     * Изменяет используемый сервером образ Docker.
      *
      * @throws \Throwable
      */
     public function dockerImage(SetDockerImageRequest $request, Server $server): JsonResponse
     {
         if (!in_array($server->image, array_values($server->egg->docker_images))) {
-            throw new BadRequestHttpException('This server\'s Docker image has been manually set by an administrator and cannot be updated.');
+            throw new BadRequestHttpException('Образ Docker этого сервера был вручную установлен администратором и не может быть обновлен.');
         }
 
         $original = $server->image;

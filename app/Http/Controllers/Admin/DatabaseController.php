@@ -20,7 +20,7 @@ use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
 class DatabaseController extends Controller
 {
     /**
-     * DatabaseController constructor.
+     * Конструктор DatabaseController.
      */
     public function __construct(
         private AlertsMessageBag $alert,
@@ -35,7 +35,7 @@ class DatabaseController extends Controller
     }
 
     /**
-     * Display database host index.
+     * Отображение индекса хостов базы данных.
      */
     public function index(): View
     {
@@ -46,7 +46,7 @@ class DatabaseController extends Controller
     }
 
     /**
-     * Display database host to user.
+     * Отображение хоста базы данных пользователю.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -60,7 +60,7 @@ class DatabaseController extends Controller
     }
 
     /**
-     * Handle request to create a new database host.
+     * Обработка запроса на создание нового хоста базы данных.
      *
      * @throws \Throwable
      */
@@ -71,7 +71,7 @@ class DatabaseController extends Controller
         } catch (\Exception $exception) {
             if ($exception instanceof \PDOException || $exception->getPrevious() instanceof \PDOException) {
                 $this->alert->danger(
-                    sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
+                    sprintf('Произошла ошибка при попытке подключения к хосту или выполнении запроса: "%s"', $exception->getMessage())
                 )->flash();
 
                 return redirect()->route('admin.databases')->withInput($request->validated());
@@ -80,13 +80,13 @@ class DatabaseController extends Controller
             }
         }
 
-        $this->alert->success('Successfully created a new database host on the system.')->flash();
+        $this->alert->success('Новый хост базы данных успешно создан в системе.')->flash();
 
         return redirect()->route('admin.databases.view', $host->id);
     }
 
     /**
-     * Handle updating database host.
+     * Обработка обновления хоста базы данных.
      *
      * @throws \Throwable
      */
@@ -96,13 +96,13 @@ class DatabaseController extends Controller
 
         try {
             $this->updateService->handle($host->id, $request->normalize());
-            $this->alert->success('Database host was updated successfully.')->flash();
+            $this->alert->success('Хост базы данных успешно обновлен.')->flash();
         } catch (\Exception $exception) {
-            // Catch any SQL related exceptions and display them back to the user, otherwise just
-            // throw the exception like normal and move on with it.
+            // Обработка любых SQL-исключений и отображение их пользователю, в противном случае просто
+            // выбросить исключение как обычно и продолжить.
             if ($exception instanceof \PDOException || $exception->getPrevious() instanceof \PDOException) {
                 $this->alert->danger(
-                    sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
+                    sprintf('Произошла ошибка при попытке подключения к хосту или выполнении запроса: "%s"', $exception->getMessage())
                 )->flash();
 
                 return $redirect->withInput($request->normalize());
@@ -115,14 +115,14 @@ class DatabaseController extends Controller
     }
 
     /**
-     * Handle request to delete a database host.
+     * Обработка запроса на удаление хоста базы данных.
      *
      * @throws \Pterodactyl\Exceptions\Service\HasActiveServersException
      */
     public function delete(int $host): RedirectResponse
     {
         $this->deletionService->handle($host);
-        $this->alert->success('The requested database host has been deleted from the system.')->flash();
+        $this->alert->success('Запрашиваемый хост базы данных был удален из системы.')->flash();
 
         return redirect()->route('admin.databases');
     }

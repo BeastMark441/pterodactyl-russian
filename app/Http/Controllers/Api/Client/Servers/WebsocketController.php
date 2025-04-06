@@ -15,7 +15,7 @@ use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 class WebsocketController extends ClientApiController
 {
     /**
-     * WebsocketController constructor.
+     * Конструктор WebsocketController.
      */
     public function __construct(
         private NodeJWTService $jwtService,
@@ -25,28 +25,28 @@ class WebsocketController extends ClientApiController
     }
 
     /**
-     * Generates a one-time token that is sent along in every websocket call to the Daemon.
-     * This is a signed JWT that the Daemon then uses to verify the user's identity, and
-     * allows us to continually renew this token and avoid users maintaining sessions wrongly,
-     * as well as ensure that user's only perform actions they're allowed to.
+     * Генерирует одноразовый токен, который отправляется в каждом вызове вебсокета к Daemon.
+     * Это подписанный JWT, который Daemon затем использует для проверки личности пользователя,
+     * и позволяет нам постоянно обновлять этот токен и избегать неправильного поддержания сеансов пользователями,
+     * а также гарантировать, что пользователи выполняют только те действия, которые им разрешены.
      */
     public function __invoke(ClientApiRequest $request, Server $server): JsonResponse
     {
         $user = $request->user();
         if ($user->cannot(Permission::ACTION_WEBSOCKET_CONNECT, $server)) {
-            throw new HttpForbiddenException('You do not have permission to connect to this server\'s websocket.');
+            throw new HttpForbiddenException('У вас нет разрешения на подключение к вебсокету этого сервера.');
         }
 
         $permissions = $this->permissionsService->handle($server, $user);
 
         $node = $server->node;
         if (!is_null($server->transfer)) {
-            // Check if the user has permissions to receive transfer logs.
+            // Проверьте, есть ли у пользователя разрешения на получение журналов передачи.
             if (!in_array('admin.websocket.transfer', $permissions)) {
-                throw new HttpForbiddenException('You do not have permission to view server transfer logs.');
+                throw new HttpForbiddenException('У вас нет разрешения на просмотр журналов передачи сервера.');
             }
 
-            // Redirect the websocket request to the new node if the server has been archived.
+            // Перенаправьте запрос вебсокета на новый узел, если сервер был архивирован.
             if ($server->transfer->archived) {
                 $node = $server->transfer->newNode;
             }

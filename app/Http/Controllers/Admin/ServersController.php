@@ -62,7 +62,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Update the details for a server.
+     * Обновить данные сервера.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -79,7 +79,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Toggles the installation status for a server.
+     * Переключить статус установки сервера.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -101,7 +101,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Reinstalls the server with the currently assigned service.
+     * Переустановить сервер с текущей назначенной службой.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -116,7 +116,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Manage the suspension status for a server.
+     * Управление статусом приостановки сервера.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -133,7 +133,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Update the build configuration for a server.
+     * Обновить конфигурацию сборки сервера.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -157,7 +157,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Start the server deletion process.
+     * Начать процесс удаления сервера.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Throwable
@@ -171,7 +171,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Update the startup command as well as variables.
+     * Обновить команду запуска, а также переменные.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -197,7 +197,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Creates a new database assigned to a specific server.
+     * Создать новую базу данных, назначенную конкретному серверу.
      *
      * @throws \Throwable
      */
@@ -214,7 +214,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Resets the database password for a specific database on this server.
+     * Сбросить пароль базы данных для конкретной базы данных на этом сервере.
      *
      * @throws \Throwable
      */
@@ -229,7 +229,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Deletes a database from a server.
+     * Удалить базу данных с сервера.
      *
      * @throws \Exception
      */
@@ -241,7 +241,7 @@ class ServersController extends Controller
     }
 
     /**
-     * Add a mount to a server.
+     * Добавить монтирование к серверу.
      *
      * @throws \Throwable
      */
@@ -254,19 +254,19 @@ class ServersController extends Controller
 
         $mountServer->saveOrFail();
 
-        $this->alert->success('Mount was added successfully.')->flash();
+        $this->alert->success('Монтирование было успешно добавлено.')->flash();
 
         return redirect()->route('admin.servers.view.mounts', $server->id);
     }
 
     /**
-     * Remove a mount from a server.
+     * Удалить монтирование с сервера.
      */
     public function deleteMount(Server $server, Mount $mount): RedirectResponse
     {
         MountServer::where('mount_id', $mount->id)->where('server_id', $server->id)->delete();
 
-        $this->alert->success('Mount was removed successfully.')->flash();
+        $this->alert->success('Монтирование было успешно удалено.')->flash();
 
         return redirect()->route('admin.servers.view.mounts', $server->id);
     }

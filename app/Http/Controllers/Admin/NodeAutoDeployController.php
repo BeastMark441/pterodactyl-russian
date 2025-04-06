@@ -14,7 +14,7 @@ use Pterodactyl\Repositories\Eloquent\ApiKeyRepository;
 class NodeAutoDeployController extends Controller
 {
     /**
-     * NodeAutoDeployController constructor.
+     * Конструктор NodeAutoDeployController.
      */
     public function __construct(
         private ApiKeyRepository $repository,
@@ -24,8 +24,7 @@ class NodeAutoDeployController extends Controller
     }
 
     /**
-     * Generates a new API key for the logged-in user with only permission to read
-     * nodes, and returns that as the deployment key for a node.
+     * Генерирует новый API-ключ для вошедшего в систему пользователя с разрешением только на чтение узлов и возвращает его в качестве ключа развертывания для узла.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
@@ -44,12 +43,11 @@ class NodeAutoDeployController extends Controller
             })
             ->first();
 
-        // We couldn't find a key that exists for this user with only permission for
-        // reading nodes. Go ahead and create it now.
+        // Мы не смогли найти ключ, который существует для этого пользователя, с разрешением только на чтение узлов. Создайте его сейчас.
         if (!$key) {
             $key = $this->keyCreationService->setKeyType(ApiKey::TYPE_APPLICATION)->handle([
                 'user_id' => $request->user()->id,
-                'memo' => 'Automatically generated node deployment key.',
+                'memo' => 'Автоматически сгенерированный ключ развертывания узла.',
                 'allowed_ips' => [],
             ], ['r_nodes' => 1]);
         }

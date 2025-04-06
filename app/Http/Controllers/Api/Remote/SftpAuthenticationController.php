@@ -27,21 +27,20 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Authenticate a set of credentials and return the associated server details
-     * for a SFTP connection on the daemon. This supports both public key and password
-     * based credentials.
+     * Аутентифицировать набор учетных данных и вернуть связанные данные сервера
+     * для SFTP-соединения на демоне. Это поддерживает как публичные ключи, так и пароли.
      */
     public function __invoke(SftpAuthenticationFormRequest $request): JsonResponse
     {
         $connection = $this->parseUsername($request->input('username'));
         if (empty($connection['server'])) {
-            throw new BadRequestHttpException('No valid server identifier was included in the request.');
+            throw new BadRequestHttpException('В запросе не указан действительный идентификатор сервера.');
         }
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $seconds = $this->limiter()->availableIn($this->throttleKey($request));
 
-            throw new TooManyRequestsHttpException($seconds, "Too many login attempts for this account, please try again in $seconds seconds.");
+            throw new TooManyRequestsHttpException($seconds, "Слишком много попыток входа для этой учетной записи, попробуйте снова через $seconds секунд.");
         }
 
         $user = $this->getUser($request, $connection['username']);
@@ -58,17 +57,17 @@ class SftpAuthenticationController extends Controller
             try {
                 $key = PublicKeyLoader::loadPublicKey(trim($request->input('password')));
             } catch (NoKeyLoadedException) {
-                // do nothing
+                // ничего не делать
             }
 
             if (!$key || !$user->sshKeys()->where('fingerprint', $key->getFingerprint('sha256'))->exists()) {
-                // We don't log here because of the way the SFTP system works. This endpoint
-                // will get hit for every key the user provides, which could be 4 or 5. That is
-                // a lot of unnecessary log noise.
+                // Мы не ведем журнал здесь из-за того, как работает система SFTP. Эта конечная точка
+                // будет вызываться для каждого ключа, предоставленного пользователем, что может быть 4 или 5. Это
+                // много ненужного шума в журнале.
                 //
-                // For now, we'll only log failures due to a bad password as those are not likely
-                // to occur more than once in a session for the user, and are more likely to be of
-                // value to the end user.
+                // На данный момент мы будем регистрировать только неудачные попытки из-за неправильного пароля, так как они вряд ли
+                // произойдут более одного раза за сеанс для пользователя и, скорее всего, будут полезны
+                // для конечного пользователя.
                 $this->reject($request, is_null($key));
             }
         }
@@ -83,8 +82,8 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Finds the server being requested and ensures that it belongs to the node this
-     * request stems from.
+     * Находит запрашиваемый сервер и гарантирует, что он принадлежит узлу, из которого
+     * исходит этот запрос.
      */
     protected function getServer(Request $request, string $uuid): Server
     {
@@ -97,7 +96,7 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Finds a user with the given username or increments the login attempts.
+     * Находит пользователя с заданным именем пользователя или увеличивает количество попыток входа.
      */
     protected function getUser(Request $request, string $username): User
     {
@@ -107,16 +106,16 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Parses the username provided to the request.
+     * Разбирает имя пользователя, предоставленное в запросе.
      *
      * @return array{"username": string, "server": string}
      */
     protected function parseUsername(string $value): array
     {
-        // Reverse the string to avoid issues with usernames that contain periods.
+        // Перевернуть строку, чтобы избежать проблем с именами пользователей, содержащими точки.
         $parts = explode('.', strrev($value), 2);
 
-        // Unreverse the strings after parsing them apart.
+        // Перевернуть строки обратно после их разбора.
         return [
             'username' => strrev(array_get($parts, 1)),
             'server' => strrev(array_get($parts, 0)),
@@ -124,7 +123,7 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Rejects the request and increments the login attempts.
+     * Отклоняет запрос и увеличивает количество попыток входа.
      */
     protected function reject(Request $request, bool $increment = true): void
     {
@@ -132,11 +131,11 @@ class SftpAuthenticationController extends Controller
             $this->incrementLoginAttempts($request);
         }
 
-        throw new HttpForbiddenException('Authorization credentials were not correct, please try again.');
+        throw new HttpForbiddenException('Учетные данные для авторизации были неверны, попробуйте еще раз.');
     }
 
     /**
-     * Validates that a user should have permission to use SFTP for the given server.
+     * Проверяет, должен ли пользователь иметь разрешение на использование SFTP для данного сервера.
      */
     protected function validateSftpAccess(User $user, Server $server): void
     {
@@ -146,7 +145,7 @@ class SftpAuthenticationController extends Controller
             if (!in_array(Permission::ACTION_FILE_SFTP, $permissions)) {
                 Activity::event('server:sftp.denied')->actor($user)->subject($server)->log();
 
-                throw new HttpForbiddenException('You do not have permission to access SFTP for this server.');
+                throw new HttpForbiddenException('У вас нет разрешения на доступ к SFTP для этого сервера.');
             }
         }
 
@@ -154,7 +153,7 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Get the throttle key for the given request.
+     * Получает ключ ограничения для данного запроса.
      */
     protected function throttleKey(Request $request): string
     {

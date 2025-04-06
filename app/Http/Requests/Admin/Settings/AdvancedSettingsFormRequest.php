@@ -37,14 +37,14 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'recaptcha:enabled' => 'reCAPTCHA Enabled',
-            'recaptcha:secret_key' => 'reCAPTCHA Secret Key',
-            'recaptcha:website_key' => 'reCAPTCHA Website Key',
-            'pterodactyl:guzzle:timeout' => 'HTTP Request Timeout',
-            'pterodactyl:guzzle:connect_timeout' => 'HTTP Connection Timeout',
-            'pterodactyl:client_features:allocations:enabled' => 'Auto Create Allocations Enabled',
-            'pterodactyl:client_features:allocations:range_start' => 'Starting Port',
-            'pterodactyl:client_features:allocations:range_end' => 'Ending Port',
+            'recaptcha:enabled' => 'reCAPTCHA Включено',
+            'recaptcha:secret_key' => 'reCAPTCHA Секретный ключ',
+            'recaptcha:website_key' => 'reCAPTCHA Веб-ключ',
+            'pterodactyl:guzzle:timeout' => 'Время ожидания HTTP-запроса',
+            'pterodactyl:guzzle:connect_timeout' => 'Время ожидания HTTP-подключения',
+            'pterodactyl:client_features:allocations:enabled' => 'Включено автоматическое создание аллокаций',
+            'pterodactyl:client_features:allocations:range_start' => 'Начальный порт',
+            'pterodactyl:client_features:allocations:range_end' => 'Конечный порт',
         ];
     }
 }

@@ -16,7 +16,7 @@ use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 class CommandController extends ClientApiController
 {
     /**
-     * CommandController constructor.
+     * Конструктор CommandController.
      */
     public function __construct(private DaemonCommandRepository $repository)
     {
@@ -24,7 +24,7 @@ class CommandController extends ClientApiController
     }
 
     /**
-     * Send a command to a running server.
+     * Отправляет команду на работающий сервер.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -40,7 +40,7 @@ class CommandController extends ClientApiController
                     $previous->getResponse() instanceof ResponseInterface
                     && $previous->getResponse()->getStatusCode() === Response::HTTP_BAD_GATEWAY
                 ) {
-                    throw new HttpException(Response::HTTP_BAD_GATEWAY, 'Server must be online in order to send commands.', $exception);
+                    throw new HttpException(Response::HTTP_BAD_GATEWAY, 'Сервер должен быть онлайн, чтобы отправлять команды.', $exception);
                 }
             }
 

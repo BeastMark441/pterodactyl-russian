@@ -23,7 +23,7 @@ use Pterodactyl\Http\Requests\Api\Client\Servers\Backups\RestoreBackupRequest;
 class BackupController extends ClientApiController
 {
     /**
-     * BackupController constructor.
+     * Конструктор BackupController.
      */
     public function __construct(
         private DaemonBackupRepository $daemonRepository,
@@ -36,8 +36,8 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Returns all the backups for a given server instance in a paginated
-     * result set.
+     * Возвращает все резервные копии для данного экземпляра сервера в виде постраничного
+     * набора результатов.
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -58,7 +58,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Starts the backup process for a server.
+     * Запускает процесс резервного копирования для сервера.
      *
      * @throws \Spatie\Fractalistic\Exceptions\InvalidTransformation
      * @throws \Spatie\Fractalistic\Exceptions\NoTransformerSpecified
@@ -69,10 +69,10 @@ class BackupController extends ClientApiController
         $action = $this->initiateBackupService
             ->setIgnoredFiles(explode(PHP_EOL, $request->input('ignored') ?? ''));
 
-        // Only set the lock status if the user even has permission to delete backups,
-        // otherwise ignore this status. This gets a little funky since it isn't clear
-        // how best to allow a user to create a backup that is locked without also preventing
-        // them from just filling up a server with backups that can never be deleted?
+        // Устанавливайте статус блокировки только в том случае, если пользователь имеет разрешение на удаление резервных копий,
+        // в противном случае игнорируйте этот статус. Это немного странно, так как неясно,
+        // как лучше всего позволить пользователю создать резервную копию, которая заблокирована, не позволяя
+        // им просто заполнить сервер резервными копиями, которые никогда не могут быть удалены?
         if ($request->user()->can(Permission::ACTION_BACKUP_DELETE, $server)) {
             $action->setIsLocked((bool) $request->input('is_locked'));
         }
@@ -90,7 +90,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Toggles the lock status of a given backup for a server.
+     * Переключает статус блокировки данной резервной копии для сервера.
      *
      * @throws \Throwable
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -113,7 +113,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Returns information about a single backup.
+     * Возвращает информацию о одной резервной копии.
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -129,8 +129,8 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Deletes a backup from the panel as well as the remote source where it is currently
-     * being stored.
+     * Удаляет резервную копию с панели, а также с удаленного источника, где она в настоящее время
+     * хранится.
      *
      * @throws \Throwable
      */
@@ -151,9 +151,9 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Download the backup for a given server instance. For daemon local files, the file
-     * will be streamed back through the Panel. For AWS S3 files, a signed URL will be generated
-     * which the user is redirected to.
+     * Загружает резервную копию для данного экземпляра сервера. Для локальных файлов демона файл
+     * будет передан через Панель. Для файлов AWS S3 будет сгенерирован подписанный URL,
+     * на который пользователь будет перенаправлен.
      *
      * @throws \Throwable
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -165,7 +165,7 @@ class BackupController extends ClientApiController
         }
 
         if ($backup->disk !== Backup::ADAPTER_AWS_S3 && $backup->disk !== Backup::ADAPTER_WINGS) {
-            throw new BadRequestHttpException('The backup requested references an unknown disk driver type and cannot be downloaded.');
+            throw new BadRequestHttpException('Запрошенная резервная копия ссылается на неизвестный тип драйвера диска и не может быть загружена.');
         }
 
         $url = $this->downloadLinkService->handle($backup, $request->user());
@@ -179,26 +179,26 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Handles restoring a backup by making a request to the Wings instance telling it
-     * to begin the process of finding (or downloading) the backup and unpacking it
-     * over the server files.
+     * Обрабатывает восстановление резервной копии, отправляя запрос на экземпляр Wings, сообщая ему
+     * начать процесс поиска (или загрузки) резервной копии и распаковки ее
+     * поверх файлов сервера.
      *
-     * If the "truncate" flag is passed through in this request then all the
-     * files that currently exist on the server will be deleted before restoring.
-     * Otherwise, the archive will simply be unpacked over the existing files.
+     * Если в этом запросе передан флаг "truncate", то все
+     * файлы, которые в настоящее время существуют на сервере, будут удалены перед восстановлением.
+     * В противном случае архив будет просто распакован поверх существующих файлов.
      *
      * @throws \Throwable
      */
     public function restore(RestoreBackupRequest $request, Server $server, Backup $backup): JsonResponse
     {
-        // Cannot restore a backup unless a server is fully installed and not currently
-        // processing a different backup restoration request.
+        // Невозможно восстановить резервную копию, если сервер полностью не установлен и в настоящее время
+        // не обрабатывает другой запрос на восстановление резервной копии.
         if (!is_null($server->status)) {
-            throw new BadRequestHttpException('This server is not currently in a state that allows for a backup to be restored.');
+            throw new BadRequestHttpException('Этот сервер в настоящее время не находится в состоянии, позволяющем восстановить резервную копию.');
         }
 
         if (!$backup->is_successful && is_null($backup->completed_at)) {
-            throw new BadRequestHttpException('This backup cannot be restored at this time: not completed or failed.');
+            throw new BadRequestHttpException('Эту резервную копию нельзя восстановить в данный момент: не завершена или неудачна.');
         }
 
         $log = Activity::event('server:backup.restore')
@@ -206,14 +206,14 @@ class BackupController extends ClientApiController
             ->property(['name' => $backup->name, 'truncate' => $request->input('truncate')]);
 
         $log->transaction(function () use ($backup, $server, $request) {
-            // If the backup is for an S3 file we need to generate a unique Download link for
-            // it that will allow Wings to actually access the file.
+            // Если резервная копия предназначена для файла S3, нам нужно сгенерировать уникальную ссылку для загрузки
+            // для него, которая позволит Wings фактически получить доступ к файлу.
             if ($backup->disk === Backup::ADAPTER_AWS_S3) {
                 $url = $this->downloadLinkService->handle($backup, $request->user());
             }
 
-            // Update the status right away for the server so that we know not to allow certain
-            // actions against it via the Panel API.
+            // Обновите статус сервера сразу, чтобы мы знали, что не следует разрешать определенные
+            // действия против него через API панели.
             $server->update(['status' => Server::STATUS_RESTORING_BACKUP]);
 
             $this->daemonRepository->setServer($server)->restore($backup, $url ?? null, $request->input('truncate'));

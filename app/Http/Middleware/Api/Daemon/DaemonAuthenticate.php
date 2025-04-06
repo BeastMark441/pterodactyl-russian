@@ -13,21 +13,21 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class DaemonAuthenticate
 {
     /**
-     * Daemon routes that this middleware should be skipped on.
+     * Маршруты демона, которые следует пропустить для этого middleware.
      */
     protected array $except = [
         'daemon.configuration',
     ];
 
     /**
-     * DaemonAuthenticate constructor.
+     * Конструктор DaemonAuthenticate.
      */
     public function __construct(private Encrypter $encrypter, private NodeRepository $repository)
     {
     }
 
     /**
-     * Check if a request from the daemon can be properly attributed back to a single node instance.
+     * Проверяет, может ли запрос от демона быть правильно приписан к одному экземпляру узла.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -38,13 +38,13 @@ class DaemonAuthenticate
         }
 
         if (is_null($bearer = $request->bearerToken())) {
-            throw new HttpException(401, 'Access to this endpoint must include an Authorization header.', null, ['WWW-Authenticate' => 'Bearer']);
+            throw new HttpException(401, 'Доступ к этой конечной точке должен включать заголовок Authorization.', null, ['WWW-Authenticate' => 'Bearer']);
         }
 
         $parts = explode('.', $bearer);
-        // Ensure that all of the correct parts are provided in the header.
+        // Убедитесь, что в заголовке указаны все правильные части.
         if (count($parts) !== 2 || empty($parts[0]) || empty($parts[1])) {
-            throw new BadRequestHttpException('The Authorization header provided was not in a valid format.');
+            throw new BadRequestHttpException('Заголовок Authorization предоставлен в недопустимом формате.');
         }
 
         try {
@@ -59,9 +59,9 @@ class DaemonAuthenticate
                 return $next($request);
             }
         } catch (RecordNotFoundException $exception) {
-            // Do nothing, we don't want to expose a node not existing at all.
+            // Ничего не делаем, мы не хотим раскрывать, что узел вообще не существует.
         }
 
-        throw new AccessDeniedHttpException('You are not authorized to access this resource.');
+        throw new AccessDeniedHttpException('У вас нет прав для доступа к этому ресурсу.');
     }
 }

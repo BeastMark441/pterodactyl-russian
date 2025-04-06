@@ -15,7 +15,7 @@ use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\UpdateStartupVariableRe
 class StartupController extends ClientApiController
 {
     /**
-     * StartupController constructor.
+     * Конструктор StartupController.
      */
     public function __construct(
         private StartupCommandService $startupCommandService,
@@ -25,7 +25,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Returns the startup information for the server including all the variables.
+     * Возвращает информацию о запуске сервера, включая все переменные.
      */
     public function index(GetStartupRequest $request, Server $server): array
     {
@@ -44,7 +44,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Updates a single variable for a server.
+     * Обновляет одну переменную для сервера.
      *
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -57,12 +57,12 @@ class StartupController extends ClientApiController
         $original = $variable->server_value;
 
         if (is_null($variable) || !$variable->user_viewable) {
-            throw new BadRequestHttpException('The environment variable you are trying to edit does not exist.');
+            throw new BadRequestHttpException('Переменная окружения, которую вы пытаетесь изменить, не существует.');
         } elseif (!$variable->user_editable) {
-            throw new BadRequestHttpException('The environment variable you are trying to edit is read-only.');
+            throw new BadRequestHttpException('Переменная окружения, которую вы пытаетесь изменить, доступна только для чтения.');
         }
 
-        // Revalidate the variable value using the egg variable specific validation rules for it.
+        // Повторно проверьте значение переменной, используя правила проверки переменных яйца.
         $this->validate($request, ['value' => $variable->rules]);
 
         $this->repository->updateOrCreate([

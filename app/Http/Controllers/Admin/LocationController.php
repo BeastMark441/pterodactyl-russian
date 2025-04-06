@@ -18,7 +18,7 @@ use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 class LocationController extends Controller
 {
     /**
-     * LocationController constructor.
+     * Конструктор LocationController.
      */
     public function __construct(
         protected AlertsMessageBag $alert,
@@ -31,7 +31,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Return the location overview page.
+     * Возвращает страницу обзора местоположений.
      */
     public function index(): View
     {
@@ -41,7 +41,7 @@ class LocationController extends Controller
     }
 
     /**
-     * Return the location view page.
+     * Возвращает страницу просмотра местоположения.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -53,20 +53,20 @@ class LocationController extends Controller
     }
 
     /**
-     * Handle request to create new location.
+     * Обрабатывает запрос на создание нового местоположения.
      *
      * @throws \Throwable
      */
     public function create(LocationFormRequest $request): RedirectResponse
     {
         $location = $this->creationService->handle($request->normalize());
-        $this->alert->success('Location was created successfully.')->flash();
+        $this->alert->success('Местоположение было успешно создано.')->flash();
 
         return redirect()->route('admin.locations.view', $location->id);
     }
 
     /**
-     * Handle request to update or delete location.
+     * Обрабатывает запрос на обновление или удаление местоположения.
      *
      * @throws \Throwable
      */
@@ -77,13 +77,13 @@ class LocationController extends Controller
         }
 
         $this->updateService->handle($location->id, $request->normalize());
-        $this->alert->success('Location was updated successfully.')->flash();
+        $this->alert->success('Местоположение было успешно обновлено.')->flash();
 
         return redirect()->route('admin.locations.view', $location->id);
     }
 
     /**
-     * Delete a location from the system.
+     * Удаляет местоположение из системы.
      *
      * @throws \Exception
      * @throws \Pterodactyl\Exceptions\DisplayException

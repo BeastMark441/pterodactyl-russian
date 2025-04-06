@@ -22,9 +22,9 @@ class BaseSettingsFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'app:name' => 'Company Name',
-            'pterodactyl:auth:2fa_required' => 'Require 2-Factor Authentication',
-            'app:locale' => 'Default Language',
+            'app:name' => 'Название компании',
+            'pterodactyl:auth:2fa_required' => 'Требовать 2-факторную аутентификацию',
+            'app:locale' => 'Язык по умолчанию',
         ];
     }
 }

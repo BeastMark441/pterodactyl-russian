@@ -16,7 +16,7 @@ class StoreSSHKeyRequest extends ClientApiRequest
     protected ?PublicKey $key;
 
     /**
-     * Returns the rules for this request.
+     * Возвращает правила для этого запроса.
      */
     public function rules(): array
     {
@@ -27,8 +27,8 @@ class StoreSSHKeyRequest extends ClientApiRequest
     }
 
     /**
-     * Check to see if this SSH key has already been added to the user's account
-     * and if so return an error.
+     * Проверяет, был ли этот SSH-ключ уже добавлен в учетную запись пользователя,
+     * и если да, возвращает ошибку.
      */
     public function withValidator(Validator $validator): void
     {
@@ -36,28 +36,28 @@ class StoreSSHKeyRequest extends ClientApiRequest
             try {
                 $this->key = PublicKeyLoader::loadPublicKey($this->input('public_key'));
             } catch (NoKeyLoadedException $exception) {
-                $this->validator->errors()->add('public_key', 'The public key provided is not valid.');
+                $this->validator->errors()->add('public_key', 'Предоставленный публичный ключ недействителен.');
 
                 return;
             }
 
             if ($this->key instanceof DSA) {
-                $this->validator->errors()->add('public_key', 'DSA keys are not supported.');
+                $this->validator->errors()->add('public_key', 'DSA ключи не поддерживаются.');
             }
 
             if ($this->key instanceof RSA && $this->key->getLength() < 2048) {
-                $this->validator->errors()->add('public_key', 'RSA keys must be at least 2048 bytes in length.');
+                $this->validator->errors()->add('public_key', 'RSA ключи должны быть длиной не менее 2048 байт.');
             }
 
             $fingerprint = $this->key->getFingerprint('sha256');
             if ($this->user()->sshKeys()->where('fingerprint', $fingerprint)->exists()) {
-                $this->validator->errors()->add('public_key', 'The public key provided already exists on your account.');
+                $this->validator->errors()->add('public_key', 'Предоставленный публичный ключ уже существует в вашей учетной записи.');
             }
         });
     }
 
     /**
-     * Returns the public key but formatted in a consistent manner.
+     * Возвращает публичный ключ, но отформатированный в едином стиле.
      */
     public function getPublicKey(): string
     {
@@ -65,12 +65,12 @@ class StoreSSHKeyRequest extends ClientApiRequest
     }
 
     /**
-     * Returns the SHA256 fingerprint of the key provided.
+     * Возвращает SHA256 отпечаток предоставленного ключа.
      */
     public function getKeyFingerprint(): string
     {
         if (!$this->key) {
-            throw new \Exception('The public key was not properly loaded for this request.');
+            throw new \Exception('Публичный ключ не был правильно загружен для этого запроса.');
         }
 
         return $this->key->getFingerprint('sha256');

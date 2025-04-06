@@ -46,10 +46,10 @@ class StoreNodeRequest extends ApplicationApiRequest
     public function attributes(): array
     {
         return [
-            'daemon_base' => 'Daemon Base Path',
-            'upload_size' => 'File Upload Size Limit',
-            'location_id' => 'Location',
-            'public' => 'Node Visibility',
+            'daemon_base' => 'Путь к базе демона',
+            'upload_size' => 'Ограничение размера загрузки файлов',
+            'location_id' => 'Местоположение',
+            'public' => 'Видимость узла',
         ];
     }
 

@@ -21,7 +21,7 @@ use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 class MountController extends Controller
 {
     /**
-     * MountController constructor.
+     * Конструктор MountController.
      */
     public function __construct(
         protected AlertsMessageBag $alert,
@@ -33,7 +33,7 @@ class MountController extends Controller
     }
 
     /**
-     * Return the mount overview page.
+     * Возвращает страницу обзора монтирования.
      */
     public function index(): View
     {
@@ -43,7 +43,7 @@ class MountController extends Controller
     }
 
     /**
-     * Return the mount view page.
+     * Возвращает страницу просмотра монтирования.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -60,7 +60,7 @@ class MountController extends Controller
     }
 
     /**
-     * Handle request to create new mount.
+     * Обрабатывает запрос на создание нового монтирования.
      *
      * @throws \Throwable
      */
@@ -72,13 +72,13 @@ class MountController extends Controller
         $model->saveOrFail();
         $mount = $model->fresh();
 
-        $this->alert->success('Mount was created successfully.')->flash();
+        $this->alert->success('Монтирование было успешно создано.')->flash();
 
         return redirect()->route('admin.mounts.view', $mount->id);
     }
 
     /**
-     * Handle request to update or delete location.
+     * Обрабатывает запрос на обновление или удаление местоположения.
      *
      * @throws \Throwable
      */
@@ -90,13 +90,13 @@ class MountController extends Controller
 
         $mount->forceFill($request->validated())->save();
 
-        $this->alert->success('Mount was updated successfully.')->flash();
+        $this->alert->success('Монтирование было успешно обновлено.')->flash();
 
         return redirect()->route('admin.mounts.view', $mount->id);
     }
 
     /**
-     * Delete a location from the system.
+     * Удаляет местоположение из системы.
      *
      * @throws \Exception
      */
@@ -108,7 +108,7 @@ class MountController extends Controller
     }
 
     /**
-     * Adds eggs to the mount's many-to-many relation.
+     * Добавляет яйца к многим отношениям монтирования.
      */
     public function addEggs(Request $request, Mount $mount): RedirectResponse
     {
@@ -121,13 +121,13 @@ class MountController extends Controller
             $mount->eggs()->attach($eggs);
         }
 
-        $this->alert->success('Mount was updated successfully.')->flash();
+        $this->alert->success('Монтирование было успешно обновлено.')->flash();
 
         return redirect()->route('admin.mounts.view', $mount->id);
     }
 
     /**
-     * Adds nodes to the mount's many-to-many relation.
+     * Добавляет узлы к многим отношениям монтирования.
      */
     public function addNodes(Request $request, Mount $mount): RedirectResponse
     {
@@ -138,13 +138,13 @@ class MountController extends Controller
             $mount->nodes()->attach($nodes);
         }
 
-        $this->alert->success('Mount was updated successfully.')->flash();
+        $this->alert->success('Монтирование было успешно обновлено.')->flash();
 
         return redirect()->route('admin.mounts.view', $mount->id);
     }
 
     /**
-     * Deletes an egg from the mount's many-to-many relation.
+     * Удаляет яйцо из многим отношений монтирования.
      */
     public function deleteEgg(Mount $mount, int $egg_id): Response
     {
@@ -154,7 +154,7 @@ class MountController extends Controller
     }
 
     /**
-     * Deletes a node from the mount's many-to-many relation.
+     * Удаляет узел из многим отношений монтирования.
      */
     public function deleteNode(Mount $mount, int $node_id): Response
     {

@@ -17,20 +17,20 @@ use Pterodactyl\Http\Requests\Api\Remote\ReportBackupCompleteRequest;
 class BackupStatusController extends Controller
 {
     /**
-     * BackupStatusController constructor.
+     * Конструктор BackupStatusController.
      */
     public function __construct(private BackupManager $backupManager)
     {
     }
 
     /**
-     * Handles updating the state of a backup.
+     * Обрабатывает обновление состояния резервной копии.
      *
      * @throws \Throwable
      */
     public function index(ReportBackupCompleteRequest $request, string $backup): JsonResponse
     {
-        // Get the node associated with the request.
+        // Получить узел, связанный с запросом.
         /** @var \Pterodactyl\Models\Node $node */
         $node = $request->attributes->get('node');
 
@@ -39,16 +39,16 @@ class BackupStatusController extends Controller
             ->where('uuid', $backup)
             ->firstOrFail();
 
-        // Check that the backup is "owned" by the node making the request. This avoids other nodes
-        // from messing with backups that they don't own.
+        // Убедитесь, что резервная копия "принадлежит" узлу, который делает запрос. Это предотвращает
+        // другие узлы от вмешательства в резервные копии, которые им не принадлежат.
         /** @var \Pterodactyl\Models\Server $server */
         $server = $model->server;
         if ($server->node_id !== $node->id) {
-            throw new HttpForbiddenException('You do not have permission to access that backup.');
+            throw new HttpForbiddenException('У вас нет разрешения на доступ к этой резервной копии.');
         }
 
         if ($model->is_successful) {
-            throw new BadRequestHttpException('Cannot update the status of a backup that is already marked as completed.');
+            throw new BadRequestHttpException('Невозможно обновить статус резервной копии, которая уже помечена как завершенная.');
         }
 
         $action = $request->boolean('successful') ? 'server:backup.complete' : 'server:backup.fail';
@@ -59,17 +59,17 @@ class BackupStatusController extends Controller
 
             $model->fill([
                 'is_successful' => $successful,
-                // Change the lock state to unlocked if this was a failed backup so that it can be
-                // deleted easily. Also does not make sense to have a locked backup on the system
-                // that is failed.
+                // Измените состояние блокировки на разблокированное, если это была неудачная резервная копия, чтобы ее можно было
+                // легко удалить. Также не имеет смысла иметь заблокированную резервную копию в системе,
+                // которая не удалась.
                 'is_locked' => $successful ? $model->is_locked : false,
                 'checksum' => $successful ? ($request->input('checksum_type') . ':' . $request->input('checksum')) : null,
                 'bytes' => $successful ? $request->input('size') : 0,
                 'completed_at' => CarbonImmutable::now(),
             ])->save();
 
-            // Check if we are using the s3 backup adapter. If so, make sure we mark the backup as
-            // being completed in S3 correctly.
+            // Проверьте, используем ли мы адаптер резервного копирования s3. Если да, убедитесь, что мы правильно
+            // отмечаем резервную копию как завершенную в S3.
             $adapter = $this->backupManager->adapter();
             if ($adapter instanceof S3Filesystem) {
                 $this->completeMultipartUpload($model, $adapter, $successful, $request->input('parts'));
@@ -80,12 +80,12 @@ class BackupStatusController extends Controller
     }
 
     /**
-     * Handles toggling the restoration status of a server. The server status field should be
-     * set back to null, even if the restoration failed. This is not an unsolvable state for
-     * the server, and the user can keep trying to restore, or just use the reinstall button.
+     * Обрабатывает переключение состояния восстановления сервера. Поле состояния сервера должно быть
+     * установлено обратно в null, даже если восстановление не удалось. Это не неразрешимое состояние для
+     * сервера, и пользователь может продолжать пытаться восстановить или просто использовать кнопку переустановки.
      *
-     * The only thing the successful field does is update the entry value for the audit logs
-     * table tracking for this restoration.
+     * Единственное, что делает поле successful, это обновляет значение записи для таблицы аудита
+     * отслеживания этого восстановления.
      *
      * @throws \Throwable
      */
@@ -105,25 +105,25 @@ class BackupStatusController extends Controller
     }
 
     /**
-     * Marks a multipart upload in a given S3-compatible instance as failed or successful for
-     * the given backup.
+     * Помечает многочастичную загрузку в данном S3-совместимом экземпляре как неудачную или успешную для
+     * данной резервной копии.
      *
      * @throws \Exception
      * @throws \Pterodactyl\Exceptions\DisplayException
      */
     protected function completeMultipartUpload(Backup $backup, S3Filesystem $adapter, bool $successful, ?array $parts): void
     {
-        // This should never really happen, but if it does don't let us fall victim to Amazon's
-        // wildly fun error messaging. Just stop the process right here.
+        // Это действительно не должно происходить, но если это произойдет, не дайте нам стать жертвой
+        // веселых сообщений об ошибках Amazon. Просто остановите процесс прямо здесь.
         if (empty($backup->upload_id)) {
-            // A failed backup doesn't need to error here, this can happen if the backup encounters
-            // an error before we even start the upload. AWS gives you tooling to clear these failed
-            // multipart uploads as needed too.
+            // Неудачная резервная копия не должна здесь выдавать ошибку, это может произойти, если резервная копия
+            // сталкивается с ошибкой до того, как мы начнем загрузку. AWS предоставляет инструменты для очистки этих неудачных
+            // многочастичных загрузок по мере необходимости.
             if (!$successful) {
                 return;
             }
 
-            throw new DisplayException('Cannot complete backup request: no upload_id present on model.');
+            throw new DisplayException('Невозможно завершить запрос резервного копирования: отсутствует upload_id в модели.');
         }
 
         $params = [
@@ -139,7 +139,7 @@ class BackupStatusController extends Controller
             return;
         }
 
-        // Otherwise send a CompleteMultipartUpload request.
+        // В противном случае отправьте запрос CompleteMultipartUpload.
         $params['MultipartUpload'] = [
             'Parts' => [],
         ];

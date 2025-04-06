@@ -41,7 +41,7 @@ const DisableTOTPDialog = () => {
         <form id={'disable-totp-form'} className={'mt-6'} onSubmit={submit}>
             <FlashMessageRender byKey={'account:two-step'} className={'-mt-2 mb-6'} />
             <label className={'block pb-1'} htmlFor={'totp-password'}>
-                Password
+                Пароль
             </label>
             <Input.Text
                 id={'totp-password'}
@@ -51,14 +51,14 @@ const DisableTOTPDialog = () => {
                 onChange={(e) => setPassword(e.currentTarget.value)}
             />
             <Dialog.Footer>
-                <Button.Text onClick={close}>Cancel</Button.Text>
+                <Button.Text onClick={close}>Отмена</Button.Text>
                 <Tooltip
                     delay={100}
                     disabled={password.length > 0}
-                    content={'You must enter your account password to continue.'}
+                    content={'Для продолжения необходимо ввести пароль от вашего аккаунта.'}
                 >
                     <Button.Danger type={'submit'} form={'disable-totp-form'} disabled={submitting || !password.length}>
-                        Disable
+                        Отключить
                     </Button.Danger>
                 </Tooltip>
             </Dialog.Footer>
@@ -67,6 +67,6 @@ const DisableTOTPDialog = () => {
 };
 
 export default asDialog({
-    title: 'Disable Two-Step Verification',
-    description: 'Disabling two-step verification will make your account less secure.',
+    title: 'Отключить Двухэтапную Проверку',
+    description: 'Отключение двухэтапной проверки сделает ваш аккаунт менее защищенным.',
 })(DisableTOTPDialog);

@@ -21,7 +21,7 @@ class AssetComposer
     {
         $view->with('asset', $this->assetHashService);
         $view->with('siteConfiguration', [
-            'name' => config('app.name') ?? 'BeastMark Ru Translation',
+            'name' => config('app.name') ?? 'BeastMark Translation',
             'locale' => config('app.locale') ?? 'ru',
             'recaptcha' => [
                 'enabled' => config('recaptcha.enabled', false),

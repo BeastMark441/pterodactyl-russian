@@ -34,7 +34,15 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
                         >
                             Pterodactyl&reg;
                         </a>
-                        &nbsp;&copy; 2015 - {new Date().getFullYear()}
+                        &nbsp;&copy; 2015 - {new Date().getFullYear()}{' '}
+                        <a
+                            rel={'noopener nofollow noreferrer'}
+                            href={'https://github.com/beastmark441/pterodactyl-russian'}
+                            target={'_blank'}
+                            css={tw`no-underline text-neutral-500 hover:text-neutral-300`}
+                        >
+                            BeastMark Translations
+                        </a>
                     </p>
                 </ContentContainer>
             </>

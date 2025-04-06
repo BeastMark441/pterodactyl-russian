@@ -73,14 +73,14 @@ export default ({ ...props }: Props) => {
         }
     }, [props.visible]);
 
-    // Formik does not support an innerRef on custom components.
+    // Formik не поддерживает innerRef на пользовательских компонентах.
     const InputWithRef = (props: any) => <Input autoFocus {...props} ref={ref} />;
 
     return (
         <Formik
             onSubmit={search}
             validationSchema={object().shape({
-                term: string().min(3, 'Please enter at least three characters to begin searching.'),
+                term: string().min(3, 'Пожалуйста, введите не менее трех символов для начала поиска.'),
             })}
             initialValues={{ term: '' } as Values}
         >
@@ -89,8 +89,8 @@ export default ({ ...props }: Props) => {
                     <Form>
                         <FormikFieldWrapper
                             name={'term'}
-                            label={'Search term'}
-                            description={'Enter a server name, uuid, or allocation to begin searching.'}
+                            label={'Поисковый запрос'}
+                            description={'Введите имя сервера, uuid или адрес для начала поиска.'}
                         >
                             <SearchWatcher />
                             <InputSpinner visible={isSubmitting}>

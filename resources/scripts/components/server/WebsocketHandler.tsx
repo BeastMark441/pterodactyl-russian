@@ -41,20 +41,20 @@ export default () => {
         socket.on('status', (status) => setServerStatus(status));
 
         socket.on('daemon error', (message) => {
-            console.warn('Got error message from daemon socket:', message);
+            console.warn('Получено сообщение об ошибке от демона:', message);
         });
 
         socket.on('token expiring', () => updateToken(uuid, socket));
         socket.on('token expired', () => updateToken(uuid, socket));
         socket.on('jwt error', (error: string) => {
             setConnectionState(false);
-            console.warn('JWT validation error from wings:', error);
+            console.warn('Ошибка валидации JWT от wings:', error);
 
             if (reconnectErrors.find((v) => error.toLowerCase().indexOf(v) >= 0)) {
                 updateToken(uuid, socket);
             } else {
                 setError(
-                    'There was an error validating the credentials provided for the websocket. Please refresh the page.'
+                    'Произошла ошибка при проверке учетных данных для веб-сокета. Пожалуйста, обновите страницу.'
                 );
             }
         });
@@ -64,8 +64,8 @@ export default () => {
                 return;
             }
 
-            // This code forces a reconnection to the websocket which will connect us to the target node instead of the source node
-            // in order to be able to receive transfer logs from the target node.
+            // Этот код принудительно переподключает к веб-сокету, что подключит нас к целевому узлу вместо исходного узла,
+            // чтобы иметь возможность получать журналы передачи от целевого узла.
             socket.close();
             setError('connecting');
             setConnectionState(false);
@@ -75,10 +75,10 @@ export default () => {
 
         getWebsocketToken(uuid)
             .then((data) => {
-                // Connect and then set the authentication token.
+                // Подключиться и установить токен аутентификации.
                 socket.setToken(data.token).connect(data.socket);
 
-                // Once that is done, set the instance.
+                // После этого установить экземпляр.
                 setInstance(socket);
             })
             .catch((error) => console.error(error));
@@ -95,8 +95,8 @@ export default () => {
     }, [instance]);
 
     useEffect(() => {
-        // If there is already an instance or there is no server, just exit out of this process
-        // since we don't need to make a new connection.
+        // Если уже есть экземпляр или нет сервера, просто выйти из этого процесса,
+        // так как нам не нужно создавать новое подключение.
         if (instance || !uuid) {
             return;
         }
@@ -112,7 +112,7 @@ export default () => {
                         <>
                             <Spinner size={'small'} />
                             <p css={tw`ml-2 text-sm text-red-100`}>
-                                We&apos;re having some trouble connecting to your server, please wait...
+                                У нас возникли проблемы с подключением к вашему серверу, пожалуйста, подождите...
                             </p>
                         </>
                     ) : (

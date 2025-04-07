@@ -24,7 +24,7 @@ export default ({ username, password, recaptchaData }: LoginData): Promise<Login
             )
             .then((response) => {
                 if (!(response.data instanceof Object)) {
-                    return reject(new Error('An error occurred while processing the login request.'));
+                    return reject(new Error('Произошла ошибка при обработке запроса на вход.'));
                 }
 
                 return resolve({
